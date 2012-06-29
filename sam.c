@@ -43,15 +43,11 @@ int samthreads(samfile_t *fp, int n_threads, int n_sub_blks)
 samfile_t *samopen(const char *fn, const char *mode, const void *aux)
 {
 	FILE *f;
-	if (strchr(mode, 'r')) {
-		if (!strcmp(fn , "-"))
-			return samdopen(STDIN_FILENO, mode, aux);
+	if (strchr(mode, 'r'))
 		f = fopen(fn, "r");
-	} else if (strchr(mode, 'w')) {
-		if (!strcmp(fn , "-"))
-			return samdopen(STDOUT_FILENO, mode, aux);
+	else if (strchr(mode, 'w'))
 		f = fopen(fn, "w");
-	} else return 0;
+	else return 0;
 	int fd = dup(fileno(f));
 	fclose(f);
 	return samdopen(fd, mode, aux);

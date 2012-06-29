@@ -351,13 +351,16 @@ int bam_fillmd(int argc, char *argv[])
 		fprintf(stderr, "         -E       extended BAQ for better sensitivity but lower specificity\n\n");
 		return 1;
 	}
-	fp = samopen(argv[optind], mode_r, 0);
+	if (strcmp(argv[optind], "-"))
+		fp = samopen(argv[optind], mode_r, 0);
+	else
+		fp = samdopen(STDIN_FILENO, mode_r, 0);
 	if (fp == 0) return 1;
 	if (is_sam_in && (fp->header == 0 || fp->header->n_targets == 0)) {
 		fprintf(stderr, "[bam_fillmd] input SAM does not have header. Abort!\n");
 		return 1;
 	}
-	fpout = samopen("-", mode_w, fp->header);
+	fpout = samdopen(STDOUT_FILENO, mode_w, fp->header);
 	fai = fai_load(argv[optind+1]);
 
 	b = bam_init1();

@@ -382,7 +382,11 @@ int main_pad2unpad(int argc, char *argv[])
 		fai = fai_load(fn_ref);
 	}
 	// open file handlers
-	if ((in = samopen(argv[optind], in_mode, fn_list)) == 0) {
+	if (strcmp(argv[optind], "-"))
+		in = samopen(argv[optind], in_mode, fn_list);
+	else
+		in = samdopen(STDIN_FILENO, in_mode, fn_list);
+	if (!in) {
 		fprintf(stderr, "[depad] failed to open \"%s\" for reading.\n", argv[optind]);
 		ret = 1;
 		goto depad_end;
@@ -403,7 +407,11 @@ int main_pad2unpad(int argc, char *argv[])
 		fprintf(stderr, "[depad] Warning - reference lengths will not be corrected without FASTA reference\n");
 		h = in->header;
 	}
-	if ((out = samopen(fn_out? fn_out : "-", out_mode, h)) == 0) {
+	if (fn_out)
+		out = samopen(fn_out, out_mode, h);
+	else
+		out = samdopen(STDOUT_FILENO, out_mode, h);
+	if (!out) {
 		fprintf(stderr, "[depad] failed to open \"%s\" for writing.\n", fn_out? fn_out : "standard output");
 		ret = 1;
 		goto depad_end;
