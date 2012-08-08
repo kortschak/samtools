@@ -201,7 +201,11 @@ int main_samview(int argc, char *argv[])
 	// generate the fn_list if necessary
 	if (fn_list == 0 && fn_ref) fn_list = samfaipath(fn_ref);
 	// open file handlers
-	if ((in = samopen(argv[optind], in_mode, fn_list)) == 0) {
+	if (strcmp(argv[optind], "-"))
+		in = samopen(argv[optind], in_mode, fn_list);
+	else
+		in = samdopen(STDIN_FILENO, in_mode, fn_list);
+	if (!in) {
 		fprintf(stderr, "[main_samview] fail to open \"%s\" for reading.\n", argv[optind]);
 		ret = 1;
 		goto view_end;
@@ -219,10 +223,16 @@ int main_samview(int argc, char *argv[])
 		in->header->text = tmp;
 		in->header->l_text = l;
 	}
-	if (!is_count && (out = samopen(fn_out? fn_out : "-", out_mode, in->header)) == 0) {
-		fprintf(stderr, "[main_samview] fail to open \"%s\" for writing.\n", fn_out? fn_out : "standard output");
-		ret = 1;
-		goto view_end;
+	if (!is_count) {
+		if (fn_out)
+			out = samopen(fn_out, out_mode, in->header);
+		else
+			out = samdopen(STDOUT_FILENO, out_mode, in->header);
+		if (!out) {
+			fprintf(stderr, "[main_samview] fail to open \"%s\" for writing.\n", fn_out? fn_out : "standard output");
+			ret = 1;
+			goto view_end;
+		}
 	}
 	if (n_threads > 1) samthreads(out, n_threads, 256); 
 	if (is_header_only) goto view_end; // no need to print alignments

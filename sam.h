@@ -41,8 +41,7 @@ extern "C" {
 	/*!
 	  @abstract     Open a SAM/BAM file
 
-	  @param fn SAM/BAM file name; "-" is recognized as stdin (for
-	  reading) or stdout (for writing).
+	  @param fn SAM/BAM file name.
 
 	  @param mode open mode /[rw](b?)([0-9]?)(u?)(h?)([xX]?)/: 'r' for reading,
 	  'w' for writing, 'b' for BAM I/O, 'u' for uncompressed BAM output,
@@ -66,7 +65,9 @@ extern "C" {
 	/*!
 	  @abstract     Open a SAM/BAM file identified by file descriptor
 
-	  @param fd SAM/BAM file descriptor.
+	  @param fd SAM/BAM file descriptor. This function can be used to replaces
+	  the previous use of samopen with a file name of '-' by using the standard
+	  stream file numbers.
 
 	  @discussion Notes:
 

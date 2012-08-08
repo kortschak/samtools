@@ -193,8 +193,14 @@ int bam_rmdup(int argc, char *argv[])
 		fprintf(stderr, "        -S    treat PE reads as SE in rmdup (force -s)\n\n");
 		return 1;
 	}
-	in = samopen(argv[optind], "rb", 0);
-	out = samopen(argv[optind+1], "wb", in->header);
+	if (strcmp(argv[optind], "-"))
+		in = samopen(argv[optind], "rb", 0);
+	else
+		in = samdopen(STDIN_FILENO, "rb", 0);
+	if (strcmp(argv[optind+1], "-"))
+		out = samopen(argv[optind+1], "wb", in->header);
+	else
+		out = samdopen(STDOUT_FILENO, "wb", in->header);
 	if (in == 0 || out == 0) {
 		fprintf(stderr, "[bam_rmdup] fail to read/write input files\n");
 		return 1;
